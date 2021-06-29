@@ -9,7 +9,7 @@ TABIX=/software/team170/miniconda3/bin/tabix
 SMARTPCA=/nfs/team205/nk5/Applications/EIG/bin/smartpca.perl
 
 # 1KG data
-THG=/nfs/team205/nk5/1000G/20181129
+THG=/nfs/team205/nk5/1000G/20190312
 
 
 # converting vcf to eigen format
@@ -17,7 +17,7 @@ rm $OUTDIR/eigen.orig.gz
 for CHR in {1..22}
 do
 	$TABIX $VCFDIR/chr$CHR.vcf.gz $CHR | awk '{print $1"\t"$2-1"\t"$2}' | gzip > $OUTDIR/tmp.bed.gz
-	$TABIX -R $OUTDIR/tmp.bed.gz $THG/chr$CHR.vcf.gz | $PROGDIR/vcf2eigen CONV -N 2548 -dose -MAF 0.05 | gzip > $OUTDIR/tmp1.eigen.gz
+	$TABIX -R $OUTDIR/tmp.bed.gz $THG/ALL.chr$CHR.shapeit2_integrated_snvindels_v2a_27022019.GRCh38.phased.vcf.gz | $PROGDIR/vcf2eigen CONV -N 2548 -dose -MAF 0.05 | gzip > $OUTDIR/tmp1.eigen.gz
 	$TABIX -R $OUTDIR/tmp.bed.gz $VCFDIR/chr$CHR.vcf.gz | $PROGDIR/vcf2eigen CONV -N 1 -dose -MAF -1.0 | gzip > $OUTDIR/tmp2.eigen.gz
 	join -1 1 -2 1 <(zcat $OUTDIR/tmp1.eigen.gz | sort -k1 -b) <(zcat $OUTDIR/tmp2.eigen.gz | sort -k1 -b) | sed 's/_/ /g' | sed 's/ /\t/g' | sort -k2 -n | gzip >> $OUTDIR/eigen.orig.gz
 done
